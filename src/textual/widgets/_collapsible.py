@@ -49,7 +49,7 @@ class CollapsibleTitle(Static, can_focus=True):
     def __init__(
         self,
         *,
-        label: str,
+        label: str | Static,
         collapsed_symbol: str,
         expanded_symbol: str,
         collapsed: bool,
@@ -64,7 +64,7 @@ class CollapsibleTitle(Static, can_focus=True):
 
     class Toggle(Message):
         """Request toggle."""
-
+    
     async def _on_click(self, event: events.Click) -> None:
         """Inform ancestor we want to toggle."""
         event.stop()
@@ -74,9 +74,10 @@ class CollapsibleTitle(Static, can_focus=True):
         """Toggle the state of the parent collapsible."""
         self.post_message(self.Toggle())
 
-    def _watch_label(self, label: str) -> None:
-        self._collapsed_label = f"{self.collapsed_symbol} {label}"
-        self._expanded_label = f"{self.expanded_symbol} {label}"
+    def _watch_label(self, label: str | Static) -> None:
+        label_text = self.label if isinstance(self.label, str) else self.label.renderable
+        self._collapsed_label = f"{self.collapsed_symbol} {label_text}"
+        self._expanded_label = f"{self.expanded_symbol} {label_text}"
         if self.collapsed:
             self.update(self._collapsed_label)
         else:
